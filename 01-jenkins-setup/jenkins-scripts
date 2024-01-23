@@ -1,0 +1,46 @@
+pipeline {
+    agent any
+    
+    environment {
+        // Define the JDK installation name
+        JDK_INSTALLATION = 'Java17'
+        // Define the Maven installation name
+        MAVEN_INSTALLATION = 'Maven3'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // You might need to customize this based on your SCM (Source Code Management)
+                checkout scm
+            }
+        }
+
+        stage('Set up JDK') {
+            steps {
+                // Install JDK if not already installed
+                script {
+                    def jdkHome = tool name: JDK_INSTALLATION, type: 'jdk'
+                    env.JAVA_HOME = jdkHome
+                    env.PATH = "${jdkHome}/bin:${env.PATH}"
+                }
+            }
+        }
+
+        stage('Build with Maven') {
+            steps {
+                // Install Maven if not already installed
+                script {
+                    def mavenHome = tool name: MAVEN_INSTALLATION, type: 'maven'
+                    env.MAVEN_HOME = mavenHome
+                    env.PATH = "${mavenHome}/bin:${env.PATH}"
+                }
+
+                // Build with Maven
+                sh 'mvn clean install'
+            }
+        }
+
+        // Add more stages as needed, such as testing, deployment, etc.
+    }
+}
